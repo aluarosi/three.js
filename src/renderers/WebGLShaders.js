@@ -555,7 +555,7 @@ THREE.ShaderChunk = {
 
 				"float lDistance = 1.0;",
 				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+					"lDistance = min( ( pointLightDistance[ i ] / length( lVector ) ) * ( pointLightDistance[ i ] / length( lVector ) ), 1.0 );",
 
 				"lVector = normalize( lVector );",
 				"float dotProduct = dot( transformedNormal, lVector );",
