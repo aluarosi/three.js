@@ -9211,14 +9211,16 @@ THREE.HemisphereLight.prototype.clone = function () {
 };
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
-THREE.PointLight = function ( hex, intensity, distance ) {
+THREE.PointLight = function ( hex, intensity, distance, quadratic ) {
 
 	THREE.Light.call( this, hex );
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
+	this.quadratic = ( quadratic !== undefined ) ? quadratic : false;
 
 };
 
@@ -9232,6 +9234,7 @@ THREE.PointLight.prototype.clone = function () {
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;
+	light.quadratic = this.quadratic;
 
 	return light;
 
@@ -15228,6 +15231,7 @@ THREE.CanvasRenderer = function ( parameters ) {
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author aluarosi / https://github.com/aluarosi/
  */
 
 THREE.ShaderChunk = {
@@ -15691,6 +15695,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+			"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 		"#endif",
 
@@ -15780,8 +15785,13 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = min( ( pointLightDistance[ i ] / length( lVector ) ) * ( pointLightDistance[ i ] / length( lVector ) ), 1.0 );",
+				"if ( pointLightDistance[ i ] > 0.0 ) {",
+					"if ( pointLightQuadratic[ i ] ) {",
+						"lDistance = min( ( pointLightDistance[ i ] / length( lVector ) ) * ( pointLightDistance[ i ] / length( lVector ) ), 1.0 );",
+					"} else {",
+						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",  
+					"}",
+				"}",
 
 				"lVector = normalize( lVector );",
 				"float dotProduct = dot( transformedNormal, lVector );",
@@ -17120,6 +17130,7 @@ THREE.UniformsLib = {
 		"pointLightColor" : { type: "fv", value: [] },
 		"pointLightPosition" : { type: "fv", value: [] },
 		"pointLightDistance" : { type: "fv1", value: [] },
+		"pointLightQuadratic" : { type: "i", value: [] },
 
 		"spotLightColor" : { type: "fv", value: [] },
 		"spotLightPosition" : { type: "fv", value: [] },
