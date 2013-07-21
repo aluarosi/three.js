@@ -1901,7 +1901,7 @@ THREE.UniformsLib = {
 		"pointLightColor" : { type: "fv", value: [] },
 		"pointLightPosition" : { type: "fv", value: [] },
 		"pointLightDistance" : { type: "fv1", value: [] },
-		"pointLightQuadratic" : { type: "i", value: [] },
+		"pointLightQuadratic" : { type: "iv1", value: [] },
 
 		"spotLightColor" : { type: "fv", value: [] },
 		"spotLightPosition" : { type: "fv", value: [] },
